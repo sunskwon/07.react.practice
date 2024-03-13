@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .header {
+            color: white;
+            background-color: black;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .main {
+            background-color: lightgray;
+            height: 400px;
+        }
+
+        .centerText {
+            text-align: center;
+            margin-top: 0px;
+        }
+
+        .box {
+            background-color: white;
+            border: 1px solid black;
+            width: 50%;
+            height: 330px;
+            margin-left: 25%;
+            margin-top: -10px;
+        }
+        
+        .line-through {
+            text-decoration: line-through;
+        }
+
+        .redBotton {
+            border-radius: 50%;
+            background-color: red;
+        }
+
+        .center {
+            width: 50%;
+            margin-left: 25%;
+        }
+
+        .oliveButton {
+            background-color: olivedrab;
+        }
+
+        .footer {
+            color: white;
+            background-color: black;
+            text-align: center;
+            font-weight: lighter;
+            padding: 5px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        const {useState} = React;
+
+        function Header() {
+            
+            const date = new Date().toLocaleDateString();
+
+            return (
+                <div className="header">    
+                    <h2>오늘의 할일! {date}</h2>
+                </div>
+            );
+        }
+        
+        function Main() {
+            
+            const [workList, setWorkList] = useState([
+                {id: 0, text: "할일 목록을 추가할 것"},
+            ])
+            
+            const [checkList, setCheckList] = useState([]);
+            const onChangeCheck = (checked, id) => {
+                if (checked) {
+                    setCheckList([...checkList, id]);
+                } else if (!checked) {
+                    setCheckList(checkList.filter(el => el !== id));
+                }
+                console.log(checkList);
+            };
+            const labelStyle = (id) => {
+                return checkList.includes(id) ? "line-through":undefined;
+            }
+
+            const [nextId, setNextId] = useState(1);
+            
+            const [inputText, setInputText] = useState('');
+            const onChangeInput = e => setInputText(e.target.value);
+            const addWorkList = () => {
+                const changedWorkList = workList.concat({
+                    id: nextId,
+                    text: inputText
+                });
+                setNextId(nextId + 1);
+                setInputText('');
+                setWorkList(changedWorkList);
+            };
+            const removeWorkList = id => {
+                const changedWorkList = workList.filter(
+                    work => work.id !== id
+                );
+                setWorkList(changedWorkList);
+            }
+
+            return(
+                <>
+                    <div className="main">
+                        <h3 className="centerText">ToDo list</h3>
+                    <div className="box">
+                        {workList.map(work => {
+                            return (
+                                <p key={work.id}>
+                                    <input
+                                        type="checkbox"
+                                        id={work.id}
+                                        onChange={
+                                            e => onChangeCheck(e.target.checked, work.id)
+                                        }
+                                    />
+                                    <label 
+                                        htmlFor={work.id}
+                                        className={labelStyle(work.id)}
+                                    >
+                                        {work.text}
+                                    </label>
+                                    <button
+                                        onClick={
+                                            () => removeWorkList(work.id)
+                                        }
+                                        class="redBotton"
+                                    >
+                                        X
+                                    </button>
+                                    <br/>
+                                </p>
+                            );
+                        })}
+                    </div>
+                    <div className="center">
+                        <input
+                            type="text"
+                            value={inputText}
+                            onChange={onChangeInput}
+                            className="center"
+                        />
+                        <button
+                            onClick={addWorkList}
+                            class="oliveButton"
+                        >
+                            입력
+                        </button>
+                    </div>
+                    </div>
+                </>
+            );
+        }
+
+        function Footer() {
+
+            const footer = 'footer';
+
+            return (
+                <div className="footer">    
+                    <h5 className={footer}>Copyright 2024 team ohgiraffers all rights reserved.</h5>
+                </div>
+            );
+        }
+
+        function Merge() {
+            return ([
+                    <Header/>,
+                    <Main/>,
+                    <Footer/>
+            ]);
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<Merge/>)
+    </script>
+</body>
+</html>
