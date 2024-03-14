@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        const {useState, useEffect} = React;
+        
+        function AnswerPrint() {
+            
+            const [answer, SetAnswer] = useState('');
+
+            const timeSec = parseInt(new Date().getSeconds());
+            const timeMin = parseInt(new Date().getMinutes())
+            const [startTimeSec, SetStartTimeSec] = useState(parseInt(new Date().getSeconds()));
+            const [startTimeMin, SetStartTimeMin] = useState(parseInt(new Date().getMinutes()));
+            
+            function Ask() {
+
+                useEffect(
+                () => {
+                    if (answer == '') {
+                    const ask = prompt("문자열을 입력하세요");
+
+                    SetAnswer(ask);
+                    }
+                },
+                []
+                )
+                return answer;
+            }
+            
+            const [input, setInput] = useState('');
+
+            const inputHandler = e => setInput(e.target.value);
+            
+            const endTime = new Date();
+            
+            const [diffenece, SetDifference] = useState();
+
+            function timeDiff() {
+                const minDiff = timeMin - startTimeMin;
+
+                const diff = 0;
+                if (timeSec < startTimeSec) {
+                    diff = (minDiff - 1) * 60 + timeSec - startTimeSec;
+                } else {
+                    diff = (minDiff) * 60 + timeSec - startTimeSec;
+                }
+                SetDifference(diff);
+            }
+            const keyPressHandler = (e: React.KeyboardEvent) => {
+
+                if (e.key === 'Enter') {
+                    if (answer == input) {
+                        alert(`소요 시간 : ${(timeMin - startTimeMin) * 60 + timeSec - startTimeSec}초`);
+                    }
+                }
+                <timeDiff/>;
+            }
+
+            return (
+                <>
+                    <h1>{<Ask/>}</h1>
+                    <input 
+                        type="text"
+                        name="input"
+                        placeholder="문자열을 다시 입력하세요"
+                        onChange={inputHandler}
+                        onKeyPress={keyPressHandler}
+                    />
+                </>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<AnswerPrint/>);
+    </script>
+</body>
+</html>
