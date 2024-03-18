@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .image{
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        const API_KEY = "9695eeef0551ed8a75c314a5fd4a2c7e";
+
+        const { useEffect, useState } = React;
+
+        function Weather({ weather, setWeather }) {
+
+            const [position, setPosition] = useState({});
+            // const [weather, setWeather] = useState({});
+            const [wind, setWind] = useState({});
+            const [cityName, setCityName] = useState('');
+
+            useEffect(
+                () => {
+                    new Promise((resolve, reject) => {
+
+                        console.log("마운트에 실행");
+                        navigator.geolocation.getCurrentPosition(currentPosition => {
+                            console.log(currentPosition);
+
+                            setPosition({
+                                longitude : currentPosition.coords.longitude,
+                                latitude : currentPosition.coords.latitude
+                            })
+                            resolve(currentPosition.coords)
+                        });
+                    }).then(coords => {
+                        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${API_KEY}`)
+                            .then(response => response.json())
+                            .then(json => {
+                                console.log(json);
+
+                                setWeather(json.weather[0]);
+                                setWind(json.wind);
+                                setCityName(json.name);
+                            })
+                    })
+                },
+                []
+            )
+
+            return (
+                <>
+                    <h3>현재 위치</h3>
+                    <h4>{`경도 : ${position.longitude} 위도 : ${position.latitude}`}</h4>
+                    <h4>{`조회 도시 : ${cityName}`}</h4>
+                    <h4>{`날씨 : ${weather.main} 날씨 설명 : ${weather.description}`}</h4>
+                    <h4>{`풍향 : ${wind.deg} 풍속 : ${wind.speed}m/s`}</h4>
+                </>
+            );
+        }
+
+        function ImagePrint({ weather }) {
+            
+            const [url, setUrl] = useState('');
+
+            let key = '';
+            
+            switch (weather.main) {
+                case "Clear":
+                    key = "sunny";
+                    // url = "https://github.githubassets.com/images/icons/emoji/unicode/2600.png?v8";
+                    break;
+                case "Clouds":
+                    key = "cloud";
+                    // url = "https://github.githubassets.com/images/icons/emoji/unicode/2601.png?v8";
+                    break;
+            }
+                    
+            useEffect(
+                () => {
+                    fetch("https://api.github.com/emojis")
+                        .then(response => response.json())
+                        .then(json => {
+                            // console.log(json);
+                            setUrl(json[key]);
+                        });
+                },
+                [weather.main]
+            );
+
+            
+            return (
+                <>
+                    {!!url? <img src={url} alt="image" className={"image"}/>:<p>돌아가</p>}
+                </>
+            );
+        }
+
+        function App() {
+            const [weather, setWeather] = useState({});
+
+            return (
+                <>
+                    <Weather weather={ weather } setWeather={ setWeather }/>
+                    <ImagePrint weather={ weather }/>
+                </>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    </script>
+</body>
+</html>
